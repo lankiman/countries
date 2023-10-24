@@ -10,6 +10,7 @@ function App() {
   const [theme, setTheme] = useState(initialTheme);
   const [regions, setRegions] = useState("Filter by Region");
   const [search, setSearch] = useState("");
+  const [country, setCountry] = useState([]);
 
   const regionFiltered = (value: string) => {
     setRegions(value);
@@ -17,6 +18,9 @@ function App() {
 
   const countrySearched = (value: string) => {
     setSearch(value);
+  };
+  const countryClicked = (value: []) => {
+    setCountry(value);
   };
 
   useEffect(() => {
@@ -31,6 +35,8 @@ function App() {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme); // Save the new theme to local storage
   };
+
+  console.log(country);
 
   const element = theme == "light" ? "bg-elements-light" : "bg-elements-dark";
   const text = theme == "light" ? "text-texts-light" : "text-texts-dark";
@@ -62,6 +68,7 @@ function App() {
           regions={regions}
           element={element}
           text={text}
+          countryClicked={countryClicked}
         />
       </div>
     </div>

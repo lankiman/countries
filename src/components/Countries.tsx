@@ -5,10 +5,12 @@ interface Props {
   text: string;
   regions: string;
   search: string;
+  countryClicked: (value: []) => void;
 }
 
-function Countries({ regions, element, text, search }: Props) {
+function Countries({ regions, element, text, search, countryClicked }: Props) {
   const [countries, setCountries] = useState<any[]>([]);
+  const [renderingData, setRenderingData] = useState<any[]>([]);
 
   async function fetchData() {
     try {
@@ -18,19 +20,20 @@ function Countries({ regions, element, text, search }: Props) {
       }
       const data = await response.json();
       setCountries(data);
+      setRenderingData(data);
     } catch (error) {
       console.error("Error fetching data from the API:", error);
 
       try {
-        const localDataResponse = await fetch("../assets/data.json"); // Update the URL to the local JSON file path
+        const localDataResponse = await fetch("../assets/data.json");
         if (!localDataResponse.ok) {
           throw new Error("Local data response was not ok");
         }
         const localData = await localDataResponse.json();
         setCountries(localData);
+        setRenderingData(localData);
       } catch (localError) {
         console.error("Error fetching local data:", localError);
-        // Handle this case based on your app's requirements
       }
     }
   }
@@ -39,64 +42,62 @@ function Countries({ regions, element, text, search }: Props) {
     fetchData();
   }, []);
 
-  // const filteredCountries = countries.filter((country) => {
-  //   const isMatch = country.name.common
-  //     .toLowerCase()
-  //     .includes(search.toLowerCase());
-  //   if (!isMatch) {
-  //     rgSet(1);
-  //     return false;
-  //   } else if (country.region == regions) {
-  //     return true;
-  //   } else if (regions == "Filter by Region") {
-  //     return true;
-  //   } else if (regions != "Filter by Region" && isMatch) {
-  //     rgSet(2);
-  //     return false;
-  //   }
-  // });
-  const filteredCountries = countries.filter((country) => {
+  const errorChecker = countries.filter((country) => {
     const isMatch = country.name.common
       .toLowerCase()
-      .includes(search.toLowerCase());
+      .includes(search.toLowerCase().trim());
     if (isMatch) {
       return true;
     }
   });
-  const regionCountries = countries.filter((country) => {
-    const isMatch = country.name.common
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    if (country.region == regions && !search) {
-      return true;
-    }
-    if (country.region == regions && search) {
-      if (isMatch) {
-        return true;
-      }
-    }
-  });
-
-  const [renderingData, setRenderingData] = useState(filteredCountries);
 
   useEffect(() => {
-    if (regions === "Filter by Region") {
-      setRenderingData(filteredCountries);
-    } else {
+    if (regions != "Filter by Region") {
+      const regionCountries = countries.filter((country) => {
+        const isMatch = country.name.common
+          .toLowerCase()
+          .includes(search.toLowerCase().trim());
+        if (country.region == regions && !search) {
+          return true;
+        }
+        if (country.region == regions && search) {
+          if (isMatch) {
+            return true;
+          }
+        }
+      });
       setRenderingData(regionCountries);
+    } else if (regions == "Filter by Region") {
+      const filteredCountries = countries.filter((country) => {
+        const isMatch = country.name.common
+          .toLowerCase()
+          .includes(search.toLowerCase().trim());
+        if (isMatch) {
+          return true;
+        }
+      });
+      setRenderingData(filteredCountries);
     }
-  }, [filteredCountries, regionCountries, regions]);
+  }, [search, regions]);
+
+  const handleCountryClick = (value: []) => {
+    countryClicked(value);
+  };
 
   if (renderingData.length > 0) {
     return (
-      <div className="lg:grid-cols-4 md:grid-cols-2 md:grid md:pl-16 md:pr-2 md:gap-x-6 md:gap-y-16">
+      <div className="flex flex-col gap-10 items-center p-4  md:pr-8 md:pl-16 md:gap-y-14 md:gap-x-8 md:p-0 lg:grid-cols-4 md:grid-cols-2 md:grid">
         {renderingData.map((country) => (
           <div
             key={country.name.common}
-            className={`${element} ${text} hover:animate-pulse cursor-pointer rounded-md shadow-md flex flex-col gap-6 md:w-[19rem] md:h-[25rem]`}
+            onClick={() => handleCountryClick(country)}
+            className={`${element} ${text} hover:animate-pulse cursor-pointer rounded-md shadow-md flex flex-col gap-6 w-[18rem] h-[23rem]  md:w-[95%] md:h-[25rem]`}
           >
             <div className="h-[50%]">
-              <img className="w-full h-full" src={country.flags.png} />
+              <img
+                className="w-full h-full rounded-t-md"
+                src={country.flags.png}
+              />
             </div>
 
             <div className="h-[40%] px-6">
@@ -125,10 +126,9 @@ function Countries({ regions, element, text, search }: Props) {
       </div>
     );
   }
-  if (filteredCountries.length > 0 && regionCountries.length == 0) {
+  if (errorChecker.length > 0 && regions != "Filter by Region") {
     return <div>country does not exist in region</div>;
-  }
-  if (filteredCountries.length == 0 && regionCountries.length == 0) {
+  } else if (search && errorChecker.length < 1) {
     return <div>country does not exist</div>;
   }
 }

@@ -9,67 +9,6 @@ interface Props {
 }
 
 const CountryDetails = ({ text, element, theme }: Props) => {
-  //   localStorage.setItem("countryData", JSON.stringify(country));
-  // }, [country]);
-
-  // const [dynamicCountry, setdynamicCountry] = useState(
-  //   country as {
-  //     flags: {
-  //       png: string;
-  //     };
-  //     name: {
-  //       common: string;
-  //       nativeName: {};
-  //     };
-  //     region: string;
-  //     capital: string;
-  //     population: number;
-  //     subregion: string;
-  //     languages: {};
-
-  //     tld: string;
-  //     borders: [];
-  //     cca3: string;
-  //   }
-  // );
-
-  // useEffect(() => {
-  //   const countryData = localStorage.getItem("countryData");
-  //   const handlePageReload = () => {
-  //     if (countryData) {
-  //       const dynamicCountry = JSON.parse(countryData) as {
-  //         flags: {
-  //           png: string;
-  //         };
-  //         name: {
-  //           common: string;
-  //           nativeName: {};
-  //         };
-  //         region: string;
-  //         capital: string;
-  //         population: number;
-  //         subregion: string;
-  //         languages: {};
-
-  //         tld: string;
-  //         borders: [];
-  //         cca3: string;
-  //       };
-  //       setdynamicCountry(dynamicCountry);
-  //     }
-  //   };
-  //   window.addEventListener("beforeunload", handlePageReload);
-  //   console.log(countryData);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handlePageReload);
-  //   };
-  // }, []);
-
-  // const languages = Object.values(dynamicCountry.languages);
-  // const nativeNames = Object.values(dynamicCountry.name.nativeName);
-  // const borders: string[] = dynamicCountry.borders;
-
   const [dynamicCountry, setDynamicCountry] = useState<any | null>(null);
   const [couns, setCouns] = useState<any[]>([]);
 

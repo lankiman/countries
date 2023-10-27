@@ -162,7 +162,7 @@ function Countries({
   if (errorChecker.length > 0 && regions != "Filter by Region") {
     return (
       <div
-        className={`${text} text-3xl text-center animate__animated animate-pulse animate__infinite md:text-6xl mt-20 md:mt-0 flex md:items-center h-full w-full justify-center `}
+        className={`${text} text-3xl text-center animate__animated animate-pulse animate__infinite md:text-6xl mt-[12rem] md:mt-0 flex md:items-center h-full w-full justify-center `}
       >
         Country does not exist in Region
       </div>
@@ -170,7 +170,7 @@ function Countries({
   } else if (search && errorChecker.length < 1) {
     return (
       <div
-        className={`${text} text-3xl animate__animated animate-pulse animate__infinite md:text-6xl mt-20 md:mt-0 flex md:items-center h-full w-full justify-center `}
+        className={`${text} text-3xl animate__animated animate-pulse animate__infinite md:text-6xl mt-[12rem] md:mt-0 flex md:items-center h-full w-full justify-center `}
       >
         Country does not exist
       </div>

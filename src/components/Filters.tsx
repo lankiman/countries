@@ -55,22 +55,9 @@ const Filters = ({
           ></input>
         </div>
         <div>
-          {/* <select className="w-full mt-4 mb-2 appearance-none text-xs p-2 focus:outline-none rounded">
-            <option disabled selected hidden className="">
-              Filter by Region
-            </option>
-            <option className="mt-2" value="Africa">
-              Africa
-            </option>
-            <option value="America">America</option>
-            <option value="Asia">Asia</option>
-            <option value="Europe">Europe</option>
-            <option value="Oceania">Oceania</option>
-
-            {/* ... more continents </select> */}
           <div className={`relative w-1/2 md:w-[10rem] text-xs ${text}`}>
             <div
-              className={`dropdown-toggle h-10 ${element} p-2 rounded  cursor-pointer flex items-center justify-around shadow `}
+              className={`dropdown-toggle h-10  ${element} p-2 rounded  cursor-pointer flex items-center justify-around shadow `}
               onClick={toggleDropdown}
             >
               {selectedOption}
@@ -78,7 +65,7 @@ const Filters = ({
             </div>
             {isOpen && (
               <div
-                className={`dropdown-menu absolute mt-1 w-full ${element} rounded shadow`}
+                className={`dropdown-menu z-10 absolute mt-1 w-full ${element} rounded shadow`}
               >
                 {continents.map((continent) => (
                   <div

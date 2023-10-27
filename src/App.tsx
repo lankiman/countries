@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Nav from "./components/Nav";
 import Filters from "./components/Filters";
 import Countries from "./components/Countries";
+import CountryDetails from "./components/CountryDetails";
 
 function App() {
   const savedTheme = localStorage.getItem("theme");
@@ -10,7 +12,6 @@ function App() {
   const [theme, setTheme] = useState(initialTheme);
   const [regions, setRegions] = useState("Filter by Region");
   const [search, setSearch] = useState("");
-  const [country, setCountry] = useState([]);
 
   const regionFiltered = (value: string) => {
     setRegions(value);
@@ -19,59 +20,79 @@ function App() {
   const countrySearched = (value: string) => {
     setSearch(value);
   };
+
   const countryClicked = (value: []) => {
-    setCountry(value);
+    localStorage.setItem("country", JSON.stringify(value));
+  };
+
+  const fetchCounData = (data: []) => {
+    localStorage.setItem("couns", JSON.stringify(data));
   };
 
   useEffect(() => {
-    // When the component mounts, check if there's a theme in local storage
     if (savedTheme) {
-      setTheme(savedTheme); // Set the theme from local storage
+      setTheme(savedTheme);
     }
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme); // Save the new theme to local storage
+    localStorage.setItem("theme", newTheme);
   };
-
-  console.log(country);
 
   const element = theme == "light" ? "bg-elements-light" : "bg-elements-dark";
   const text = theme == "light" ? "text-texts-light" : "text-texts-dark";
 
   return (
-    <div
-      className={`w-screen h-screen overflow-auto ${
-        theme == "light" ? "bg-backgrounds-light" : "bg-backgrounds-dark"
-      }`}
-    >
-      <div className="">
-        <Nav
-          toggleTheme={toggleTheme}
-          theme={theme}
-          element={element}
-          text={text}
-        />
-        <Filters
-          onFilter={regionFiltered}
-          theme={theme}
-          element={element}
-          text={text}
-          countrySearched={countrySearched}
-        />
+    <Router>
+      <div
+        className={`w-screen h-screen overflow-auto ${
+          theme == "light" ? "bg-backgrounds-light" : "bg-backgrounds-dark"
+        }`}
+      >
+        <div className="">
+          <Nav
+            toggleTheme={toggleTheme}
+            theme={theme}
+            element={element}
+            text={text}
+          />
+        </div>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Filters
+                  onFilter={regionFiltered}
+                  theme={theme}
+                  element={element}
+                  text={text}
+                  countrySearched={countrySearched}
+                />
+
+                <Countries
+                  search={search}
+                  regions={regions}
+                  element={element}
+                  text={text}
+                  countryClicked={countryClicked}
+                  fetchCounData={fetchCounData}
+                  theme={theme}
+                />
+              </>
+            }
+          />
+          <Route
+            path="/CountryDetails"
+            element={
+              <CountryDetails element={element} text={text} theme={theme} />
+            }
+          />
+        </Routes>
       </div>
-      <div>
-        <Countries
-          search={search}
-          regions={regions}
-          element={element}
-          text={text}
-          countryClicked={countryClicked}
-        />
-      </div>
-    </div>
+    </Router>
   );
 }
 

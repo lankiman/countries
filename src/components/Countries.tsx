@@ -1,16 +1,30 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   element: string;
   text: string;
   regions: string;
   search: string;
+  theme: string;
   countryClicked: (value: []) => void;
+  fetchCounData: (value: []) => void;
 }
 
-function Countries({ regions, element, text, search, countryClicked }: Props) {
+function Countries({
+  regions,
+  element,
+  text,
+  search,
+  countryClicked,
+  fetchCounData,
+  theme
+}: Props) {
   const [countries, setCountries] = useState<any[]>([]);
   const [renderingData, setRenderingData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   async function fetchData() {
     try {
@@ -21,6 +35,8 @@ function Countries({ regions, element, text, search, countryClicked }: Props) {
       const data = await response.json();
       setCountries(data);
       setRenderingData(data);
+      fetchCounData(data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data from the API:", error);
 
@@ -32,6 +48,8 @@ function Countries({ regions, element, text, search, countryClicked }: Props) {
         const localData = await localDataResponse.json();
         setCountries(localData);
         setRenderingData(localData);
+        fetchCounData(localData);
+        setLoading(false);
       } catch (localError) {
         console.error("Error fetching local data:", localError);
       }
@@ -81,8 +99,23 @@ function Countries({ regions, element, text, search, countryClicked }: Props) {
   }, [search, regions]);
 
   const handleCountryClick = (value: []) => {
+    navigate("/CountryDetails");
     countryClicked(value);
   };
+  if (loading) {
+    return (
+      <div
+        className={`${text} text-4xl animate__animated animate__pulse animate__infinite md:text-6xl flex items-center h-full w-full justify-center `}
+      >
+        {" "}
+        <div
+          className={`w-16 h-16 border-t-4 ${
+            theme == "light" ? "border-black" : "border-white"
+          }  border-solid rounded-full animate-spin`}
+        ></div>
+      </div>
+    );
+  }
 
   if (renderingData.length > 0) {
     return (
@@ -108,7 +141,7 @@ function Countries({ regions, element, text, search, countryClicked }: Props) {
                 <p className="font-bold" key={country.population}>
                   Population:{" "}
                   <span className="text-inputs-light">
-                    {country.population}
+                    {country.population.toLocaleString()}
                   </span>
                 </p>
                 <p className="font-bold" key={country.region}>
@@ -127,9 +160,21 @@ function Countries({ regions, element, text, search, countryClicked }: Props) {
     );
   }
   if (errorChecker.length > 0 && regions != "Filter by Region") {
-    return <div>country does not exist in region</div>;
+    return (
+      <div
+        className={`${text} text-4xl animate__animated animate-pulse animate__infinite md:text-6xl flex items-center h-full w-full justify-center `}
+      >
+        country does not exist in region
+      </div>
+    );
   } else if (search && errorChecker.length < 1) {
-    return <div>country does not exist</div>;
+    return (
+      <div
+        className={`${text} text-4xl animate__animated animate-pulse animate__infinite md:text-6xl flex items-center h-full w-full justify-center `}
+      >
+        country does not exist
+      </div>
+    );
   }
 }
 

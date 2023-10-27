@@ -7,7 +7,10 @@ import CountryDetails from "./components/CountryDetails";
 
 function App() {
   const savedTheme = localStorage.getItem("theme");
-  const initialTheme = savedTheme || "light";
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+  const initialTheme = savedTheme || systemTheme;
 
   const [theme, setTheme] = useState(initialTheme);
   const [regions, setRegions] = useState("Filter by Region");

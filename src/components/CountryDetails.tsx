@@ -141,7 +141,6 @@ const CountryDetails = ({ text, element, theme }: Props) => {
         return bordersAcry.includes(borderCountry.cca3);
     })
     .map((borderCountry) => borderCountry.name.common);
-  console.log(borderCountries);
 
   return (
     <div className="p-10 md:p-16">

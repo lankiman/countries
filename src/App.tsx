@@ -38,7 +38,6 @@ function App() {
 
   useEffect(() => {
     async function fetchData() {
-      console.log("Fethc rand");
       try {
         setLoading(true);
         const response = await fetch("https://restcountries.com/v3.1/all");

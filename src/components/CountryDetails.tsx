@@ -1,56 +1,27 @@
-import { useEffect, useState } from "react";
 import { ArrowLongLeftIcon } from "@heroicons/react/20/solid";
 import { useNavigate } from "react-router-dom";
+import { ICountries } from "../interface";
 
 interface Props {
   element: string;
   text: string;
   theme: string;
+  selectedCountry: any;
+  countries: ICountries[];
 }
 
-const CountryDetails = ({ text, element, theme }: Props) => {
-  const [dynamicCountry, setDynamicCountry] = useState<any | null>(null);
-  const [couns, setCouns] = useState<any[]>([]);
-
+const CountryDetails = ({
+  countries,
+  text,
+  element,
+  theme,
+  selectedCountry
+}: Props) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const countryData = localStorage.getItem("country");
-    const counsData = localStorage.getItem("couns");
+  console.log({ selectedCountry });
 
-    if (countryData) {
-      const parsedCountryData = JSON.parse(countryData);
-      setDynamicCountry(parsedCountryData);
-    }
-
-    if (counsData) {
-      const parsedCounsData = JSON.parse(counsData);
-      setCouns(parsedCounsData);
-    }
-  }, []);
-
-  // Type assertion for dynamicCountry
-  const dynamicCountryTyped = dynamicCountry as {
-    flags: {
-      png: string;
-    };
-    name: {
-      common: string;
-      nativeName: {};
-    };
-    region: string;
-    capital: string;
-    population: number;
-    subregion: string;
-    languages: {};
-
-    tld: string;
-    borders: [];
-    cca3: string;
-    currencies: {};
-  };
-
-  if (!dynamicCountryTyped) {
+  if (!selectedCountry) {
     return (
       <div
         className={`${text} text-4xl animate__animated animate__pulse animate__infinite md:text-6xl flex items-center h-full w-full justify-center `}
@@ -64,17 +35,15 @@ const CountryDetails = ({ text, element, theme }: Props) => {
       </div>
     );
   }
-  const languages: string[] = Object.values(dynamicCountryTyped.languages);
-  const currency: string[] = Object.values(dynamicCountryTyped.currencies).map(
+  const languages: string[] = Object.values(selectedCountry.languages);
+  const currency: string[] = Object.values(selectedCountry.currencies).map(
     (currencyObj: any) => currencyObj.name
   );
 
-  const bordersAcry: string[] = dynamicCountryTyped.borders;
-  const nativeNames: any = Object.values(
-    dynamicCountryTyped.name.nativeName
-  ).pop();
+  const bordersAcry: string[] = selectedCountry.borders;
+  const nativeNames: any = Object.values(selectedCountry.name.nativeName).pop();
 
-  const borderCountries: any = couns
+  const borderCountries: string[] = countries
     .filter((borderCountry) => {
       if (bordersAcry != undefined)
         return bordersAcry.includes(borderCountry.cca3);
@@ -97,8 +66,8 @@ const CountryDetails = ({ text, element, theme }: Props) => {
       <div className="flex flex-col lg:flex-row md:flex  md:w-full md:gap-20">
         <div className="mb-8 md:min-w-[28rem]  max-w-[28rem]">
           <img
-            key={dynamicCountryTyped.flags.png}
-            src={dynamicCountryTyped.flags.png}
+            key={selectedCountry.flags.png}
+            src={selectedCountry.flags.png}
             alt=""
             className="w-full rounded-sm "
           />
@@ -106,10 +75,10 @@ const CountryDetails = ({ text, element, theme }: Props) => {
         <div className={`${text}`}>
           <div className="md:mt-2">
             <p
-              key={dynamicCountryTyped.name.common}
+              key={selectedCountry.name.common}
               className="font-extrabold mb-5 md:text-2xl"
             >
-              {dynamicCountryTyped.name.common}
+              {selectedCountry.name.common}
             </p>
           </div>
           <div className="md:flex md:gap-32">
@@ -121,38 +90,36 @@ const CountryDetails = ({ text, element, theme }: Props) => {
 
               <p
                 className="font-bold min-w-max"
-                key={dynamicCountryTyped.population}
+                key={selectedCountry.population}
               >
                 Population:{" "}
                 <span className="text-inputs-light">
-                  {dynamicCountryTyped.population.toLocaleString()}
+                  {selectedCountry.population.toLocaleString()}
                 </span>
               </p>
-              <p key={dynamicCountryTyped.region} className="min-w-max">
+              <p key={selectedCountry.region} className="min-w-max">
                 Region:{" "}
                 <span className="text-inputs-light">
-                  {dynamicCountryTyped.region}
+                  {selectedCountry.region}
                 </span>
               </p>
-              <p key={dynamicCountryTyped.subregion} className="min-w-max">
+              <p key={selectedCountry.subregion} className="min-w-max">
                 Sub Region:{" "}
                 <span className="text-inputs-light">
-                  {dynamicCountryTyped.subregion}
+                  {selectedCountry.subregion}
                 </span>
               </p>
-              <p key={dynamicCountryTyped.capital}>
+              <p key={selectedCountry.capital}>
                 Capital:{" "}
                 <span className="text-inputs-light">
-                  {dynamicCountryTyped.capital}
+                  {selectedCountry.capital}
                 </span>
               </p>
             </div>
             <div className="mt-6 space-y-1 md:space-y-[0.2rem]">
-              <p key={dynamicCountryTyped.tld} className="min-w-max">
+              <p key={selectedCountry.tld} className="min-w-max">
                 Top Level Domain:{" "}
-                <span className="text-inputs-light">
-                  {dynamicCountryTyped.tld}
-                </span>
+                <span className="text-inputs-light">{selectedCountry.tld}</span>
               </p>
               <p className="min-w-max">
                 Currencies:{" "}
@@ -175,6 +142,7 @@ const CountryDetails = ({ text, element, theme }: Props) => {
               {borderCountries.length != 0 ? (
                 borderCountries.map((border: string) => (
                   <p
+                    key={border}
                     className={`${element} text-sm text-inputs-light text-center w-fit px-4 py-1 shadow-md`}
                   >
                     {border}

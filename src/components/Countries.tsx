@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
+import { ICountries } from "../interface";
 
 interface Props {
   element: string;
   text: string;
   regions: string;
   search: string;
+  countries: any[];
+  loading: boolean;
   theme: string;
-  countryClicked: (value: []) => void;
-  fetchCounData: (value: []) => void;
+  setSelectedCountry: Dispatch<SetStateAction<ICountries | undefined>>;
 }
 
 function Countries({
@@ -16,76 +18,41 @@ function Countries({
   element,
   text,
   search,
-  countryClicked,
-  fetchCounData,
+  countries,
+  loading,
+  setSelectedCountry,
   theme
 }: Props) {
-  const [countries, setCountries] = useState<any[]>([]);
-  const [renderingData, setRenderingData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [renderingData, setRenderingData] = useState<ICountries[]>([]);
+
+  useEffect(() => {
+    setRenderingData(countries);
+  }, [countries]);
 
   const navigate = useNavigate();
 
-  async function fetchData() {
-    try {
-      const response = await fetch("https://restcountries.com/v3.1/all");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setCountries(data);
-      setRenderingData(data);
-      fetchCounData(data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data from the API:", error);
-
-      try {
-        const localDataResponse = await fetch("../assets/data.json");
-        if (!localDataResponse.ok) {
-          throw new Error("Local data response was not ok");
-        }
-        const localData = await localDataResponse.json();
-        setCountries(localData);
-        setRenderingData(localData);
-        fetchCounData(localData);
-        setLoading(false);
-      } catch (localError) {
-        console.error("Error fetching local data:", localError);
-      }
-    }
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const errorChecker = countries.filter((country) => {
-    const isMatch = country.name.common
-      .toLowerCase()
-      .includes(search.toLowerCase().trim());
-    if (isMatch) {
-      return true;
-    }
-  });
+  const [notInRegion, setNotInRegion] = useState(false);
 
   useEffect(() => {
     if (regions != "Filter by Region") {
+      let countryValid = false;
       const regionCountries = countries.filter((country) => {
         const isMatch = country.name.common
           .toLowerCase()
           .includes(search.toLowerCase().trim());
-        if (country.region == regions && !search) {
-          return true;
-        }
-        if (country.region == regions && search) {
-          if (isMatch) {
+        isMatch ? (countryValid = true) : null;
+        if (country.region == regions) {
+          if (!search) {
+            return true;
+          } else if (isMatch) {
             return true;
           }
         }
+        return false;
       });
+      setNotInRegion(countryValid);
       setRenderingData(regionCountries);
-    } else if (regions == "Filter by Region") {
+    } else {
       const filteredCountries = countries.filter((country) => {
         const isMatch = country.name.common
           .toLowerCase()
@@ -98,9 +65,10 @@ function Countries({
     }
   }, [search, regions]);
 
-  const handleCountryClick = (value: []) => {
+  const handleCountryClick = (value: ICountries) => {
+    setSelectedCountry(value);
+    localStorage.setItem("selectedCountry", JSON.stringify(value));
     navigate("/CountryDetails");
-    countryClicked(value);
   };
   if (loading) {
     return (
@@ -159,7 +127,7 @@ function Countries({
       </div>
     );
   }
-  if (errorChecker.length > 0 && regions != "Filter by Region") {
+  if (notInRegion && regions != "Filter by Region") {
     return (
       <div
         className={`${text} text-3xl text-center animate__animated animate-pulse animate__infinite md:text-6xl mt-[12rem] md:mt-0 flex md:items-center h-full w-full justify-center `}
@@ -167,7 +135,7 @@ function Countries({
         Country does not exist in Region
       </div>
     );
-  } else if (search && errorChecker.length < 1) {
+  } else if (search && !notInRegion) {
     return (
       <div
         className={`${text} text-3xl animate__animated animate-pulse animate__infinite md:text-6xl mt-[12rem] md:mt-0 flex md:items-center h-full w-full justify-center `}

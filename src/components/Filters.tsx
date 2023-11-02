@@ -6,35 +6,33 @@ interface Props {
   theme: string;
   element: string;
   text: string;
-  onFilter: (value: string) => void;
-  countrySearched: (value: string) => void;
+  setRegions: React.Dispatch<React.SetStateAction<string>>;
+  regions: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Filters = ({
   theme,
   element,
   text,
-  onFilter,
-  countrySearched
+  setRegions,
+  regions,
+  setSearch
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("Filter by Region");
   const continents = ["Africa", "Americas", "Asia", "Europe", "Oceania"];
-  const [searchInput, setSearchInput] = useState("");
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   const handleOptionClick = (continent: string) => {
-    setSelectedOption(continent);
-    if (selectedOption == continent) {
-      setSelectedOption("Filter by Region");
+    setRegions(continent);
+    if (regions == continent) {
+      setRegions("Filter by Region");
     }
     setIsOpen(false);
   };
-  onFilter(selectedOption);
-  countrySearched(searchInput);
 
   return (
     <div className="w-screen px-8 md:px-16 p-4 mt-4">
@@ -51,7 +49,7 @@ const Filters = ({
             } bg-transparent text-xs rounded w-full h-10 p-2 focus:outline-none`}
             type="text"
             placeholder="Search for a country ..."
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
           ></input>
         </div>
         <div>
@@ -60,7 +58,7 @@ const Filters = ({
               className={`dropdown-toggle h-10  ${element} p-2 rounded  cursor-pointer flex items-center justify-around shadow `}
               onClick={toggleDropdown}
             >
-              {selectedOption}
+              {regions}
               <ChevronDownIcon className={`w-5 ${text}`} />
             </div>
             {isOpen && (

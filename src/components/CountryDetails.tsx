@@ -19,8 +19,6 @@ const CountryDetails = ({
 }: Props) => {
   const navigate = useNavigate();
 
-  console.log({ selectedCountry });
-
   if (!selectedCountry) {
     return (
       <div
